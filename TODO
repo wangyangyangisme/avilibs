@@ -1,0 +1,17 @@
+
+In order of priority:
+
+
+- Finish AVRstream_support.c functions and freeze the 
+  interface once I have verified that it is functional.
+
+- Start adding stream support for avi writing (AVW)
+
+- Debug libavi thoroughly
+
+- Write the documentation
+
+- Design libcodec for unified and automatic handling
+  of video/audio codecs. (DON'T HOLD YOUR BREATH)
+
+- etc...

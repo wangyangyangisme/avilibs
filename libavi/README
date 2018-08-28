@@ -1,0 +1,32 @@
+
+
+This code is in ALPHA status. It is 
+intended for people that are reasonably
+experienced with compilers, debuggers etc.
+It does provide some functionality but
+is far from being complete (NOTE: libavi
+will never DECODE video streams! it just handles
+file creation/parsing/demultiplexing and eventually
+synchronization). To compile you need the current
+libriff, please have a look at the makefile, it's quite 
+readable.
+
+It is not my intention to contribute to
+the huge load of bad code that circulates on
+the internet. This code is currently
+being developed and is therefore NOT FINAL.
+Please bear with me. Such things do take time.
+
+All bug reports are extremely welcome. 
+If you feel you can add something to the code
+please contact me at <ptsant at otenet.gr>.
+
+Documentation is being slowly written. Until then have a
+look at the test directory for some minor 
+examples. The /doc directory contains the manual (under
+heavy developement!) and some examples. Do not take them
+too seriously, they are not yet ready.
+
+Have fun!
+
+Petros

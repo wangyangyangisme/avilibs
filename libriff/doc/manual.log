@@ -1,0 +1,75 @@
+This is TeX, Version 3.14159 (Web2C 7.3.1) (format=latex 2001.9.22)  20 JAN 2002 12:02
+**manual.tex
+(manual.tex
+LaTeX2e <1999/12/01> patch level 1
+Babel <v3.6Z> and hyphenation patterns for american, french, german, ngerman, g
+reek, greek-poly, nohyphenation, loaded.
+(/usr/share/texmf/tex/latex/base/article.cls
+Document Class: article 1999/09/10 v1.4a Standard LaTeX document class
+(/usr/share/texmf/tex/latex/base/size12.clo
+File: size12.clo 1999/09/10 v1.4a Standard LaTeX file (size option)
+)
+\c@part=\count79
+\c@section=\count80
+\c@subsection=\count81
+\c@subsubsection=\count82
+\c@paragraph=\count83
+\c@subparagraph=\count84
+\c@figure=\count85
+\c@table=\count86
+\abovecaptionskip=\skip41
+\belowcaptionskip=\skip42
+\bibindent=\dimen102
+) (manual.aux)
+\openout1 = `manual.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 15.
+LaTeX Font Info:    ... okay on input line 15.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 15.
+LaTeX Font Info:    ... okay on input line 15.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 15.
+LaTeX Font Info:    ... okay on input line 15.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 15.
+LaTeX Font Info:    ... okay on input line 15.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 15.
+LaTeX Font Info:    ... okay on input line 15.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 15.
+LaTeX Font Info:    ... okay on input line 15.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <14.4> on input line 24.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <7> on input line 24.
+ [1
+
+] (manual.toc
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <12> on input line 4.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <8> on input line 4.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <6> on input line 4.
+
+[2])
+\tf@toc=\write3
+\openout3 = `manual.toc'.
+
+ [3] [4] [5] [6] [7] [8] [9] [10] [11]
+Overfull \hbox (5.2002pt too wide) in paragraph at lines 415--415
+[]\OT1/cmtt/m/n/12 RFRseek_forward_to_chunk_type(riff_handle *input,uint32_t ty
+pe);[] 
+ []
+
+[12] [13] [14]
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <5> on input line 527.
+ [15] [16] [17] [18] [19] (manual.aux) ) 
+Here is how much of TeX's memory you used:
+ 245 strings out of 10855
+ 2426 string characters out of 72085
+ 50478 words of memory out of 263001
+ 3236 multiletter control sequences out of 10000+0
+ 10280 words of font info for 36 fonts, out of 400000 for 1000
+ 57 hyphenation exceptions out of 1000
+ 23i,8n,19p,154b,303s stack positions out of 300i,100n,500p,50000b,4000s
+
+Output written on manual.dvi (19 pages, 54440 bytes).

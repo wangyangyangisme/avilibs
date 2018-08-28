@@ -1,0 +1,146 @@
+
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+#include "aviread.h"
+#include "aviwrite.h"
+
+int
+main(int argc, char *argv[]) 
+{
+  avi_handle *avifile;
+  register int i,j;
+  clock_t start, end;
+  int stream_size[32];
+  int frames[32];
+  int big_buffer[131072];
+  uint32_t frame_type;
+  int frame_size;
+
+  /* Now lets try to read an avi file... */
+
+  if (argc<3) {
+    fprintf(stderr,"Need 2 arguments. avt #file #framecount\n");
+    return(EXIT_FAILURE);
+  }
+ while(1)
+{
+  avifile=AVRopen_avi_file(argv[argc-2]);
+  
+  AVRprint_header_info(avifile, stdout);
+  AVRprint_stream_info(avifile, stdout, 0);
+//  AVRprint_stream_info(avifile, stdout, 1);
+
+  fprintf(stderr,"---> Seek without using idx... \n");
+
+  for(i=0; i<32; i++) 
+    stream_size[i]=frames[i]=0;  
+  
+  for (j=0; j<atol(argv[argc-1])<<1;)
+    for (i=0; i<avifile->total_streams; i++){
+      frame_size=AVRget_frame(avifile, i, (void *)big_buffer, &frame_type);
+      if (frame_size>0) {
+	fprintf(stdout,"Stream %d : read frame %d [index %d]: size %d, type %s.\n",
+		i, j, avifile->stream_idxp[i], frame_size, _RFWfcc2s(frame_type));
+	stream_size[i]+=frame_size;
+	j++;
+      } else AVRnext_frame(avifile, i);	
+    }
+
+  for (i=0; i<avifile->total_streams; i++)
+    fprintf(stdout,"%s: %8d bytes.\n", 
+	    avifile->stream_name[i], stream_size[i]);
+  
+  
+  fprintf(stderr,"---> Seek using idx... \n");
+  for (i=0; i<32; i++) 
+    stream_size[i]=frames[i]=0;
+
+  /* Now let's build an index */
+
+#ifdef BUILD_INDEX
+  fprintf(stdout,"Building index (forced for testing)!\n");
+  
+  start=clock();
+  _AVRbuild_idx(avifile);
+  end=clock()-start;
+
+  fprintf(stdout,"Done building the index in %f seconds (user+sys cpu time, not REAL time).\n",
+	  (double)end/CLOCKS_PER_SEC);
+  fprintf(stdout,"\t %f items/sec (%d items, %d bytes).\n",	  
+	  (double)avifile->idx_array_size*CLOCKS_PER_SEC/end,
+	  avifile->idx_array_size, 
+	  avifile->idx_array_size*sizeof(AVIINDEXENTRY));
+#endif
+
+  start=clock();
+
+  for (j=0; j<atol(argv[argc-1]); j++)
+    for (i=0; i<avifile->total_streams; i++){
+      frame_size=AVRget_frame_idx(avifile, i, (void *)big_buffer, &frame_type);
+      fprintf(stdout,"Stream %d : read frame %d [index %d]: size %d, type %s.\n",
+	      i, j, avifile->stream_idxp[i], frame_size, _RFWfcc2s(frame_type));
+      	stream_size[i]+=frame_size;
+      if (AVRnext_frame_idx(avifile, i)>=0){
+#if 0
+	fprintf(stdout,"Stream %d: Next frame [%3d, type %s, size %5d] found at %ld (index %d).\n", 
+		i, j, _RFWfcc2s(avifile->stream_file[i]->block_type),
+		avifile->stream_file[i]->block_size, ftell(avifile->stream_file[i]->input),
+		avifile->stream_idxp[i]);
+#endif
+      }
+      else frames[i]=(frames[i]!=0?frames[i]:j-1);
+    }
+
+  for (i=0; i<avifile->total_streams; i++)
+    if (frames[i]==0)
+      frames[i]=j;
+
+  /* Yeah, this sucks! */
+  fprintf(stderr,"%s: visited %d frames (FORWARD). Index is %d.\n",
+	  avifile->stream_name[0], frames[0], avifile->stream_idxp[0]);
+  fprintf(stderr,"%s: visited %d frames (FORWARD). Index is %d.\n",
+	  avifile->stream_name[1], frames[1], avifile->stream_idxp[1]);
+
+  /* Go back, so that we undo the effect of the 
+     last "AVRnext_frame_idx() */
+  AVRprevious_frame_idx(avifile,0);
+//  AVRprevious_frame_idx(avifile,1);
+
+  for (j=0; j<atol(argv[argc-1]); j++)
+    for (i=0; i<avifile->total_streams; i++){    
+      frame_size=AVRget_frame_idx(avifile, i, (void *)big_buffer, &frame_type);
+      fprintf(stdout,"Stream %d : read frame %d [index %d]: size %d, type %s.\n",
+	      i, j, avifile->stream_idxp[i], frame_size, _RFWfcc2s(frame_type));
+      stream_size[i+16]+=frame_size;
+      if (AVRprevious_frame_idx(avifile, i)>=0){
+#if 0
+	fprintf(stdout,"Stream %d: Next frame [%3d, type %s, size %5d] found at %ld (index %d).\n", 
+		i, j, _RFWfcc2s(avifile->stream_file[i]->block_type),
+		avifile->stream_file[i]->block_size, ftell(avifile->stream_file[i]->input),
+		avifile->stream_idxp[i]);
+#endif
+      }
+    }
+  
+  end=clock()-start;
+  fprintf(stdout,"Done seeking in %f seconds. (%f fps)\n",
+	  (double)end/CLOCKS_PER_SEC,
+	  (frames[0]+frames[1])*2.0/(double)end*CLOCKS_PER_SEC);
+
+  for (i=0; i<avifile->total_streams; i++)
+    fprintf(stdout,"%s: %8d bytes.\n", 
+	    avifile->stream_name[i], stream_size[i]);
+
+  for (i=0; i<avifile->total_streams; i++)
+    fprintf(stdout,"%s: %8d bytes.\n", 
+	    avifile->stream_name[i], stream_size[i+16]);
+
+  AVRclose_avi_file(avifile);
+}
+  return(0);
+
+}
+

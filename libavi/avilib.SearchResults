@@ -1,0 +1,8 @@
+---- AVRprint_stream_info Æ¥Åä (7 in 6 ÎÄ¼þ) ----
+Aviread.h (libavi):AVRprint_stream_info(avi_handle *input, FILE *where, unsigned int stream);
+AVRget_stream_info.c (libavi):	    AVRprint_stream_info(input, stderr, input->total_streams-1);
+AVRopen_avi_file.c (libavi):AVRprint_stream_info(avi_handle *input, FILE *where, unsigned int stream)
+Example1.c (libavi\doc):    AVRprint_stream_info(avifile, stdout, i);
+Example2.c (libavi\doc):    AVRprint_stream_info(avifile, stdout, i);
+Main.c (libavi\test):  AVRprint_stream_info(avifile, stdout, 0);
+Main.c (libavi\test):  AVRprint_stream_info(avifile, stdout, 1);

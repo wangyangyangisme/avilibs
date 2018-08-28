@@ -1,0 +1,6 @@
+
+Please note that "make" should work, but I have never tested 
+"make install". If it fails for you try copying the files
+manually (headers should preferrably go in /usr/local/include/riff
+and libraries in /usr/local/lib). Creating a better installation
+script is not a priority until libavi gets stable.

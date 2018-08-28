@@ -1,0 +1,14 @@
+
+
+Since 1.06 :
+
+- WARNING: changed the API. _RFRraw_seek() now calls 
+  _RFRget_next_info() to read block information whenever
+  you seek. I decided that it was a little bit redundant
+  to use _RFRraw_seek() as a simple wrapper (why use
+  _RFRraw_seek, instead of fseek()?) so I added a  
+  call to _RFRget_next_info(). DO NOT CALL THIS FUNCTION
+  after _RFRraw_seek().
+
+- Some changes to the manual.
+

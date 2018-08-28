@@ -1,0 +1,740 @@
+
+\documentclass[12pt, a4paper]{article}
+
+
+\font\sevenrm=cmr7
+\font\ninerm=cmr9
+\font\bigfont=cmb12 scaled\magstep2
+\font\bigsymbol=cmsy10 scaled\magstep2
+
+\def\comment#1 {\vskip 9pt {\bigsymbol \char'051} {\ninerm #1 } \vskip 9pt}
+% \def\comment#1 {}
+
+\def\superscript#1 {\hbox{\sevenrm \raise .5ex \hbox{#1}}}
+
+\begin{document}
+
+\newcommand{\libriff}[0]{\emph{libriff}}
+\newcommand{\mymail}[0]{\texttt{<ptsant@otenet.gr>}}
+
+\title{\emph{libriff}: a library that handles RIFF files}
+\author{Petros K. Tsantoulis}
+\date{20/08/2001}
+
+\maketitle
+\vskip 40ex
+\hfil\mymail{}\hfil
+
+\hfil\verb+http://avilibs.sourceforge.net+\hfil
+\newpage
+\tableofcontents
+\newpage
+\section{What's this?}
+ This library tries to facilitate the handling of RIFF files, 
+especially AVI (Audio/Video Interleave) files. It is part, 
+indeed the core, of a larger project that will try to offer 
+an easy to use solution for reading and writing of video 
+and audio streams. I am releasing this library to the 
+general public under the popular GNU GPL v.2 license in the
+hope that it will be useful to free software developers. I 
+reserve the right to change the licensing policy or restrict
+it to GNU GPL v.2 if later versions of the GNU GPL are not 
+satisfactory.
+
+ This is a document that tries to give some information to future
+developers and users of \libriff{}. It is not particularly thorough
+or complete at the moment. This library and especially its documentation
+are a work in progress. Feel free to bother me with e-mail 
+at \texttt{<ptsant@otenet.gr>} for anything related to \libriff{}
+(spam does {\bf not} count as related.)
+
+\section{Installation}
+Installation should be relatively painless. This library depends only
+on the standard C library. The GNU C library version 2.2.3 has been used
+and should be considered the library of reference. 
+
+After uncompressing the sources in an appropriate directory (I must assume 
+you have already done that) all you have to do is issue 
+``make ; make install'' and the library will be installed under 
+/usr/local/lib and /usr/local/include/libriff. Check the Makefile if 
+you prefer some other destination directory. If you wish to rebuild the current 
+manual from the .tex source you are going to need \LaTeX{} but this is not 
+strictly necessary. Note that in recent versions a makefile for the mingw
+developement environment in windows 32-bit has been included. This makefile,
+named \verb+Makefile.w32+, was created by Simon Moser, along with the
+code changes that allow you to build a windows dynamically linked 
+library from the current code. I have not used \libriff{} in the win32
+environment, but I believe that it works nicely (or, at least, not worse
+than under linux).
+
+\section{General Design}
+\subsection{Object oriented}
+ This library has been written in an implicitly object oriented manner.
+This means that although C is not an ``object oriented'' language you are
+expected to treat all internal data structures as ``private'' and manipulate
+them solely with the aid of the accompanying functions, unless of
+course you \emph{know} what you are doing (in which case, C gives you enough
+rope to hang yourselves, if you so desire.) 
+
+\subsection{Extending the library}
+If further basic functionality is needed it can be implemented either on top
+of the existing functions or on top of the existing data structures
+(\texttt{{\bf struct} riff\_handle} .) If data structures are externally
+modified you should take great care at all times to preserve data integrity.
+Please note that you may \emph{read} values off the riff\_handle structure
+but this structure may change in future versions while the function interface 
+(if it exists) for the variable of interest should remain consistent. 
+All functions do some sanity tests to ensure that the library maintains a correct 
+and consistent internal environment. 
+
+\subsection{The C language}
+ The language C was chosen instead of C++ because it generally compiles better,
+is compatible with C++ and results in smaller and faster executables. It can
+be argued that C++ has several advantages, but this is a matter of personal opinion
+and not subject of debate.
+
+ Currently the library is faithful to the C89 coding standard, possibly with some
+GNU C compiler extensions, but some C99 features may be implemented in the feature.
+GCC v3.0 provides some C99 support and should be considered the reference 
+C compiler. Older compilers should normally work without problems.
+
+\section{Bugs, Features and Design Limitations} 
+\subsection{Bugs}
+No known bugs at the moment. Many of them probably exist but I haven't
+seen them. Do contact me at \mymail{} if you see them.
+\subsection{Features}
+Several. I consider the most important to be :
+\begin{description}
+\item[Robustness.] This library contains internal checking code. It should
+handle most errors gracefully and, most importantly, it allows you to easily
+spot possible bugs.
+\item[Portability.] This library aims towards maximum portability. It uses
+standard C library functions and should compile on almost any platform.
+Effort has been made to make it portable to big-endian machines but since
+the author does not use such a machine for development the code has
+been untested. 
+\item[Freedom.] As in ``Freedom of Speech'', this library is released to the
+general public under conditions that permit and encourage the sharing of
+source code and ideas. This is a distinct advantage.
+\end{description}
+\subsection{Design Limitations.} 
+There are some design limitations that may be troublesome in some cases.
+I consider some of them to be (feel free to add your own) :
+\begin{description}
+\item[No internal buffering:] This library does not try to buffer data to
+memory when reading or writing a file. This task is left to the C library
+functions. I consider standard C library functions to be
+sufficiently fast when coupled with an operating system that uses reasonable 
+caching techniques.  I cannot supply you with measurements that prove my 
+decision was correct but can speculate that the extra speed will not be 
+worth the added complexity.
+\item[Limited number of open lists:] This library will not handle RIFF
+files that contain more than 1024 (an arbitrary number that can easily be
+redefined in ``defines.h'') open, nested
+lists. Any number of lists may be contained in the file but they may not
+be nested deeper than 1024 at a time. I consider this to be a trivial 
+limitation. Indeed it is not hard to add a dynamically growing data 
+type such as a linked list that will solve this problem but this 
+will be relatively slower. I really do not expect RIFF files with more 
+than 1024 nested lists to exist. 
+\item[Designed to handle AVI files:] The code was developed with AVI files
+in mind and may not be appropriate for other types of RIFF files. The author
+has made every effort to keep all functions generic and relatively extensible
+but implicit assumptions could possibly limit the usefulness of this library
+with other types of RIFF files. Please contact me to report such cases.
+\item[No read/write mode:] The code will only handle reading
+\emph{or} writing a file but not both at the same time. Editing a RIFF file
+in place is quite difficult and cumbersome. You may achieve the same functionality
+by using a read-only master file and a temporary output file. This allows for cleaner
+code and more elegant design. 
+\item[No indexing:] It is theoretically possible to build a mechanism for 
+efficient traversal of the file by creating an index structure that
+refers to the position of all (or perhaps the most recently visited) blocks
+in the file. Its usability depends on the underlying type of RIFF and I 
+think it should be part of specialized libraries.
+\item[Single RIFF structure per file:] It is theoretically possible to add more RIFF
+structures after the end of the first, but \libriff{} does not support reading
+or writing this. You can use multiple files for that. After all, \libriff{}
+properly handles 4GB RIFF files, which is the theoretical maximum, and also
+a very large file size for many filesystems. 
+\end{description}
+
+\section{Usage}
+ The main features of the library will be presented in a brief manner here. The
+header and object source code should be considered the definite reference. 
+You may be interested in reading the example code supplied with the library
+sources.
+
+\subsection{Basic RIFF structure}
+ The fundamental blocks of RIFF files are \emph{chunks} and \emph{lists}.
+
+\begin{verbatim}
+CHUNK structure
+<4 byte chunk type> (can be '00dc', 'strf' etc)
+<4 byte chunk data size>
+I: size counted from here
+<chunk data>
+\end{verbatim}
+
+\begin{verbatim}
+LIST structure
+<4 byte word LIST ('L','I','S','T')> 
+<4 byte list size>
+I: size counted from here
+<4 byte list type>
+<blocks that belong to the list>
+\end{verbatim}
+
+Please note that all blocks begin on a 16-bit boundary. The recorded list or
+chunk size only refers to the data that follows and does not take into 
+account the header.
+
+It is also apparent that the RIFF file is a forward singly-linked structure,
+in the sense that even though it is relatively easy to seek forward, by jumping
+to the next block, it is relatively difficult to seek backward. Indeed, an
+efficient method of moving backwards has to be implemented by the calling 
+program, perhaps in the form of an index structure. Currently this library
+does not support such an indexing method. Some types of RIFF files, most
+importantly AVI files, contain an appropriate index structure (the \verb+idx1+
+chunk) that can be used to seek in the file. I believe that this kind
+of indexing should be implemented in an outer layer that corresponds to the
+RIFF file type of interest and not inside the generic core RIFF library.
+
+\subsubsection{Important constants}
+Some constants that are part of the RIFF file specification are:
+\begin{verbatim}
+/* RIFF file signature */
+const uint32_t opRIFF=FOURCC('R','I','F','F'); 
+/* LIST signature */
+const uint32_t opLIST=FOURCC('L','I','S','T');
+/* JUNK chunk signature */
+const uint32_t opJUNK=FOURCC('J','U','N','K');
+\end{verbatim}
+
+These constants are defined inside the file ``riffcodes.h''. To
+build your own see the file ``fourcc.h''.
+
+\subsection{Opening files for reading}
+ The library cannot handle a read/write mode. You can only read or write at
+a file.
+
+\subsubsection{RFRopen\_riff\_file()}
+\begin{verbatim}
+riff_handle * handle;
+
+handle=RFRopen_riff_file(``filename'');
+
+if (handle==0) 
+	exit(-1); /* Could not open file */
+else  
+	...  /* File succesfully opened for reading */
+\end{verbatim}
+
+A four character code in the form of a \verb+uint32_t+ must 
+be supplied to denote the type of RIFF file that is 
+being created. For example, AVI files are of type
+\verb+const uint32_t opAVI=0x20495641; /* = 'A','V','I',' ' */+
+
+See the \verb+``fourcc.h''+ facilities for building \verb+uint32_t+
+four character codes from four characters.
+
+ Notice that the RFR prefix stands for Riff Read, and the RFW prefix stands for
+Riff Write. An underscore character ``\verb+_+'' may be prepended to show that 
+the corresponding function is internal to the library. Such functions should not
+be accessed by the calling program under normal circumstances.
+
+\subsubsection{RFRclose\_riff\_file()}
+\begin{verbatim}
+int
+RFRclose_riff_file(riff_handle *handle);
+\end{verbatim}
+
+When you are done reading the file you can close it (and free the data structures
+associated with the handle) by calling RFRclose\_riff\_file(). The handle will
+no longer be accessible after that. 
+
+
+\subsection{Reading blocks}
+
+To read a block you need very few functions. The most important are:
+\begin{verbatim}
+int RFRget_block_info(riff_handle *handle, 
+      uint32_t *type,
+      uint32_t *size,
+      uint32_t *list_type);
+int RFRget_chunk(riff_handle *handle, 
+      unsigned char *buffer);
+int RFRskip_chunk(riff_handle *handle);
+\end{verbatim}
+
+\subsubsection{RFRget\_block\_info()}
+The most important function is perhaps RFRget\_block\_info(). You need to call
+RFRget\_block\_info() before every action that you plan to take, unless, of
+course if you \emph{know} that this action is applicable under the current
+circumstances. 
+
+RFRget\_block\_info() returns the size of the current block and also copies
+relevant information to the provided variables. The variable \verb+type+
+contains the type of the next block which is either \verb+LIST+ or the
+chunk type. The variable \verb+size+ contains the size of the next block.
+The variable \verb+list_type+ refers to the list type of the current block,
+\emph{if} it is a list. If the current block is not a list then \verb+list_type+
+refers to the type of the list that contains it. 
+
+% -- Done!
+% \comment{IMPLEMENT LIST INFORMATION FOR CHUNKS!}
+
+The function will not fail if pointers to type, size and list\_type are not
+provided. It will return the current block size only.
+
+\subsubsection{RFRget\_chunk()}
+This function copies the data from the current chunk to the provided buffer.
+This function will report an error if you do not provide an initialized buffer.
+
+Please remember that \emph{no buffer overflow  checking is done} and it is
+therefore possible that your program will perform a segment violation if 
+the buffer is not at least of size equal to the current chunk's size.
+To avoid such errors you should either use a sufficiently 
+large buffer or ensure at all times that the current buffer is larger than
+the size reported by RFRget\_block\_info for the current chunk.
+
+The return value is the number of bytes copied.
+
+\subsubsection{RFRskip\_chunk()}
+This function proceeds to the next chunk without handling the current one.
+It is assumed that the current block is always a chunk. In other words,
+RFRskip\_chunk() will never skip a list. You may use this function to
+skip chunks that you do not wish to process.
+
+Return values are 0 for success, 1 if the current block is a list and $<0$
+on various failures.
+
+\subsection{Reading lists}
+Several functions are useful when reading lists:
+\begin{verbatim}
+int RFRenter_list(riff_handle *handle);
+int RFRskip_list(riff_handle *handle);
+int RFRgoto_list_end(riff_handle *handle);
+int RFRgoto_list_start(riff_handle *handle);
+\end{verbatim}
+
+\subsubsection{RFRenter\_list()}
+This function allows you to proceed inside the list. It is applicable
+only if the current block is a list. The alternative
+function RFRskip\_list(), that is also applicable if the current block
+is a list, will skip the list header and its contents.
+
+The library does keep track of nested lists (lists inside other lists),
+up to a maximum depth of 1023 lists. This function does some internal
+book-keeping to ensure that the library is always accurately aware of
+the list status. 
+
+The return value is 0 on success, and, as usual $<0$ on various failures.
+
+\subsubsection{RFRskip\_list()}
+This function is applicable if the current block is a list. Contrary to
+the RFRenter\_list() function it will skip the list header and the list
+contents.   
+
+The return value is 0 on success, and, as usual $<0$ on various failures.
+
+\subsubsection{RFRgoto\_list\_end() and RFRgoto\_list\_start()}
+These functions jump out of the list and move either to its end or to its
+start. The effect is actually that of \emph{exiting} the list without 
+producing a special list end block. The function RFRgoto\_list\_end()
+should be treated as a way of skipping a list when inside it, its effect
+is the same as RFRskip\_list() when at the start of the list. Note that
+these functions are applicable only if the current block is a list.
+
+The return value is 0 on success, and, as usual $<0$ on various failures.
+
+\subsubsection{List end special blocks}
+In order to keep your program aware of the current list status the library
+will inform you by means of special ``phoney'' block information whenever
+a list boundary is crossed. These blocks do \emph{not} exist in the actual
+file, nor are they part of the RIFF specification. They are produced
+by \libriff{}. 
+
+% \comment{ IMPLEMENT block\_size == list\_type!}
+
+The form of a list\_end block is:
+\begin{verbatim}
+/* This is a list */
+block_type     = opLIST; 
+
+/* This is the true type of the list that just ended! */
+block_size     = list_type;
+ 
+/* This list appears to be of type ``list'' */
+block_subtype  = opLIST; 
+
+/* Check for a list_end block */
+RFRget_block_info(handle, type, size, list_type);
+
+if (type==opLIST) {
+     if (list_type==opLIST) 
+        /* This is a special list end block. */
+        /* The list of type ``size'' just ended. */
+     else 
+        /* This is a normal list */
+} else
+     /* This is a chunk */
+\end{verbatim}
+
+\subsection{Seeking}
+Many functions are devoted to seeking. Most probably you won't
+need every one of them. As a matter of fact, I strongly suggest
+that you avoid them, with the exception of RFRfind\_chunk() and
+RFReof(). Improper use of seeking can disrupt the internal data
+structures and make the library fail. Great care must be taken 
+not to exit or enter any lists without calling the appropriate list
+functions. 
+
+\begin{verbatim}
+int
+RFRseek_forward_to_chunk_type(riff_handle *input,uint32_t type);
+int
+RFRseek_forward_to_list_type(riff_handle *input,uint32_t type);
+int
+RFRfind_chunk(riff_handle *input, uint32_t type);
+
+int
+RFRseek_to_position(riff_handle *input, long file_position);
+int
+RFRsave_position(riff_handle *input);
+int
+RFRrestore_position(riff_handle *input);
+
+long
+RFRget_position(riff_handle *input);
+int
+RFRrewind(riff_handle *handle);
+
+int
+RFReof(riff_handle *input);
+\end{verbatim}
+
+\subsubsection{RFRseek\_forward\_to\_chunk\_type()}
+This function and its brother RFRseek\_forward\_to\_list\_type()
+will do exactly what their names imply. They will proceed in a forward
+direction until they find a block of the appropriate type and they will
+stop there, returning a value of 1. If the block cannot be found
+these functions will reach the end of the file, entering and exiting
+lists in the process. 
+
+The most appropriate way of recovering from these functions is RFRrewind().
+Simply seeking to original point in the file will \emph{NOT} do because 
+the list keeping has changed and the library will fail. This is a direct
+result of the inability to move backwards in RIFF files.
+% (note: an indexing
+% scheme maybe added on top of \libriff{} in the future)
+
+\subsubsection{RFRfind\_chunk()}
+This is the best function to use for searching. Contrary to the previous
+functions, this function will \emph{NOT} exit
+the current list. If it does not find a chunk of the required type it 
+will stop at list end, file end or at the
+start of a new list inside the current one, whichever occurs first. 
+Upon completion a return value of 1 means that the chunk was found, 0
+that the search had to stop. As always, $<0$ represents various
+failures.
+
+\subsubsection{RFRseek\_to\_position()}
+This function will move the file pointer to the specified position. 
+It will do this in a safe manner, respecting the file structure, and
+is thus propably safer than \verb+fseek()+ especially when you do not
+use the ``linear view'' feature (see below for this.)
+Note that RFRseek\_to\_position() may need to
+RFRrewind() the file and can be \emph{very} slow in degenerate cases. 
+It is my understanding that in most cases it will work sufficiently
+fast. 
+%\emph{Please note that if the specified position is not the
+%start of a block, bad things
+%will happen. It is a critical assumption
+%that the file pointer always lies at the start of a block.} 
+As usual,
+0 means success and $<0$ represents various failures.
+
+\subsubsection{RFRsave\_position() and RFRrestore\_position()}
+The function RFRsave\_position() saves the current file position in an internal
+holder variable and RFRrestore\_position() will go back to that position.
+
+\subsubsection{RFRget\_position()}
+This function acts as a wrapper for ftell(). The return value, of type \verb+long+
+is the file position.
+
+\subsubsection{RFRrewind()}
+This function will return the file pointer to position 12L, right \emph{after}
+the RIFF file header, and properly initialize the internal data structures.
+This function can be used to start scanning the file from the beginning.
+
+\subsubsection{RFReof()}
+This function returns 1 if the end of the file has been reached, 0 otherwise.
+
+\subsubsection{Linear view}
+%This is considered an {\bf experimental feature}. It may break some functions, but I think it is
+%relatively safe. 
+
+Normally RIFF files are implicitly ``hierarchical'' because of the
+existence of lists. Every chunk belongs to the lowest level list that contains it, e.g.
+in an avi file {\it strf\/} belongs to {\it strl\/} that is contained in {\it hdrl\/}. 
+Linear view means that the file is seen in as a purely linear structure.
+This has the advantage that seeking can be done efficiently using \verb+fseek()+ 
+because we do not care about list boundaries
+%\footnote{Naturally
+%you must respect \emph{block} boundaries if you use {\tt fseek()} otherwise you will get garbage. \libriff{}
+%cannot help in that case.}. 
+The main disadvantage is that you may \emph{not} switch 
+back to ``hierarchical'' view unless you \verb+RFRrewind()+ and you will \emph{not} get 
+any list end notifications. You will normally
+see all lists opening, but none will appear to close. To enable this feature set 
+\verb+riff_handle->linear_view=1+ (0 by default).
+
+An obvious use for this is in conjunction with the AVI file index that allows you to
+safely move inside the {\it movi} list from keyframe to keyframe. After you parse the
+AVI header you can enable linear view to allow fast seeking without the burdens of
+list book-keeping.
+
+Linear view does not work in riff writing mode. Its value is ignored. Also, please
+note that the interface and/or behaviour may change slightly if any bugs are
+discovered. 
+
+\subsubsection*{Raw seeking}
+You may use raw seeking either when the file does not keep hierarchical
+list information (\emph{linear view} mentioned above) or when you can
+guarantee that you will not cross list boundaries.
+
+\begin{verbatim}
+int _RFRraw_seek(riff_handle *, long);
+\end{verbatim}
+
+The above function works exactly like 
+\verb+fseek()+ but also checks for some errors and calls \verb+_RFRget_next_info()+
+afterwards to read block information. This means that the file position should
+be a block start and also even, since the RIFF file format is explicitly
+word aligned. If for some obscure reason you need to seek to a point that
+is not a RIFF block start you may simply use plain-old \verb+fseek()+. 
+
+The return value is normally 0 and will be \verb+<+0 if an error occurs.
+
+\subsection{JUNK chunks and alignment}
+Files of RIFF type are implicitly aligned on a 16-bit boundary at the
+start of every block. However,
+it is commonly preferable to align these files to some other boundary such
+as 2048 bytes (data CD block size) by placing all or some of the blocks
+in positions that are multiple of 2048.\footnote{Note that if you intend to
+align a file so that it can be read quickly off a CD-ROM you will have to
+align chunks to 2040 so that the chunk data starts at 2048, after the 8-byte header.}
+This is achieved by using chunks
+of type JUNK as padding. See the function RFWalign\_riff() for writing aligned
+blocks.
+
+The \libriff{} library has the ability to transparently \emph{skip} all
+such chunks or treat them as normal chunks while reading. When in 
+``skipping'' mode you will never encounter a chunk of type JUNK.
+All are silently ignored. When in normal mode all JUNK chunks are 
+properly reported and it is up to you to handle them or ignore them.
+
+\subsubsection{RFRskip\_junk()}
+You can use the function RFRskip\_junk() to
+specify whether you would like the library to silently ignore all junk chunks.
+
+\begin{verbatim}
+int RFRskip_junk(riff_handle *handle, int skip_junk); 
+
+RFRskip_junk(handle, 1);  /* Junk chunks will be ignored */  
+RFRskip_junk(handle, 0);  /* Junk chunks will be processed */
+\end{verbatim}
+
+Junk skipping is off by default. Return value is equal to skip\_junk if successful,
+or $<0$ on various failures.
+
+\subsection{Opening files for writing}
+ The library cannot handle a read/write mode. You can only read or write at
+a file.
+\subsubsection{RFWcreate\_riff\_handle()}
+\begin{verbatim}
+riff_handle * handle;
+
+handle=RFWcreate_riff_handle(``filename'', uint32_t file_type);
+
+if (handle==0)
+	exit(-1); /* Could not open file */
+else
+	... /* File ready for writing. */
+}
+\end{verbatim}
+
+\subsubsection{RFWclose\_riff()}
+\begin{verbatim}
+int
+RFWclose_riff(riff_handle *handle);
+\end{verbatim}
+Closes the RIFF file and frees memory.
+Returns -1 on failure, 0 on success. 
+
+\subsubsection{RFWwrite\_chunk()}
+\begin{verbatim}
+int
+RFWwrite_chunk(riff_handle *handle, 
+               uint32_t type, 
+               uint32_t length, 
+               unsigned char *data)
+\end{verbatim}
+
+This function writes a chunk of type ``type'' with data of length ``length'' to
+the associated file. The return value is equal to the number of bytes that actually
+get written to the file. Note that this is not necessarily equal to ``length'', 
+because it also includes at least 8 bytes for the header and, possibly, a single
+byte for alignment purposes. A successful write must return length+8 or length+9.
+Please remember that the data pointer must have been properly initialized.
+If the function fails you will get a return value $<0$.
+
+\subsubsection{RFWrewrite\_chunk()}
+\begin{verbatim}
+int
+RFWrewrite_chunk(riff_handle *handle, 
+	      uint32_t type, 
+	      uint32_t length, 
+	      unsigned char *data,
+	      long file_pos)
+\end{verbatim}
+Rewrites a chunk at the specified position. This function's only difference with 
+write\_chunk() is that it does not increase the file and 
+also it does not do any alignment.
+Returns number of bytes written, i.e. length plus 8 bytes for the header.
+This is a potentially dangerous function. It can disrupt the RIFF file if 
+not used with caution.
+
+\subsubsection{RFWwrite\_raw\_chunk()}
+\begin{verbatim}
+int
+RFWwrite_raw_chunk(riff_handle *handle, 
+                   uint32_t length, 
+                   unsigned char *data)
+\end{verbatim}
+Returns number of bytes written, normally equal to ``length''.
+The chunks are written ``as-is'', and may not be legal if you do
+not take care to supply an appropriate header. No alignment is done 
+after the data, but this function will ensure that they start at an
+aligned boundary. 
+
+\subsubsection{RFWcreate\_list()}
+\begin{verbatim}
+int
+RFWcreate_list(riff_handle *handle, uint32_t type)
+\end{verbatim}
+Creates a list of type ``type''. This function opens the list and reserves
+space for its header. The list size is not written until you close the 
+list with RFWclose\_list(). The return value is normally 12. Anything else
+signifies an error.
+
+\subsubsection{RFWclose\_list()}
+\begin{verbatim}
+int
+RFWclose_list(riff_handle *handle)
+\end{verbatim}
+Closes the last list that was opened and writes its header properly. Note that
+you can't have more than MAX\_LISTS (1024) lists open at once.
+
+\subsubsection{RFWalign\_riff()}
+\begin{verbatim}
+int
+RFWalign_riff(riff_handle *handle, int boundary)
+\end{verbatim}
+This function writes a JUNK chunk of the appropriate size
+to align the file at the requested boundary. Note that the
+requested boundary should be greater than 8 bytes, because
+that is the size of the CHUNK header. You may not specify
+an odd boundary, because RIFF files are word aligned.
+
+\subsection{Miscellaneous functions}
+\begin{verbatim}
+char *    _RFWfcc2s(uint32_t fcc);
+uint32_t  _RFWs2fcc(char c1, char c2, char c3, char c3);
+\end{verbatim}
+Several other functions of special, or limited interest exist.
+I consider the above functions to be 
+routinely quite useful. 
+The first functions creates a 4 character, null
+terminated string from a 32-bit unsigned int code  as in 
+\verb+_RFWfcc2s(ophdrl)+, which should return ``hdrl''.
+This function uses a static space (5 characters) to write
+its output so every time you call it the previous result
+gets overwritten. This is especially apparent if you
+call it twice from \verb+printf()+ where you will only get
+the result of the last call.
+The second function builds an unsigned
+32-bit int code from 4 characters as in \verb+_RFWfcc2s('s','t','r','l')+.
+
+
+%\subsection{Is that all?}
+%Several other functions also exist but are of limited interest. You are urged
+%to read the header files to see if some of the more esoteric or trivial
+%functions not presented here suit your needs. 
+
+\section{Notes to developers}
+If you are willing to work further \emph{on} this library, instead of working
+\emph{with} it there are some minor points you should perhaps consider.
+
+\subsection{Coding style}
+ The coding style is as verbose as possible in order to ensure readability and
+maintenability. I personally prefer the ``stroustrup'' coding style that emacs
+offers. You can see for yourselves by examining the source code files. 
+
+ According to the GNU coding standards all functions in the library are prefixed
+to ensure that naming conflicts do not arise. Function names are prefixed with
+{\bf RFW} if they are useful when writing and with {\bf RFR} if they are useful when 
+reading. An underscore character ``\_'' is added to the front to denote functions
+that are internal to the library and should not be invoked by the calling
+program. 
+
+ Comments should clearly describe what the code does and should mention important
+events such as the opening of a file, allocation/deallocation of memory etc.
+I consider a well written comment header before the function declaration
+an element of good coding style. I tend to copy headers between .c and .h files 
+to keep them up to date.
+
+ Another point of interest is the examination of return values. I strongly 
+suggest the checking of all return values, especially when calling functions
+external to this library, e.g. C library functions. As a general rule, 
+every function should verify its input parameters, the status of the internal
+data structures and the return values of all called functions.
+
+\subsubsection{Sanity checks and verbosity}
+Debugging checks are done with the aid of the ``sanity.h'' facilities.
+Two useful macros are provided : \texttt{SCHK(condition, action)} and 
+\texttt{XCHK(condition, action)}. An SCHK is enabled whenever CHECKS is defined at
+compiled. An XCHK is enabled whenever EXTENDED\_CHECKS is defined at compile time.
+Generally speaking, SCHK is used for reasonable and often quick checks while XCHK
+refers to more computationally expensive checks that are not likely to fail. The possible
+actions are ACT\_FAIL, ACT\_WARN and ACT\_ERROR. I try to use ACT\_FAIL whenever something
+has gone bad and cannot be corrected or understood. The default action, then is to 
+exit() the program. This is done, for example, if the internal data structures
+become corrupt, or if the library cannot allocate memory. An error that is
+handled with ACT\_ERROR is usually less serious, possibly the result of bad calling
+parameters. In that case, the action is to return(-1) from the current function.
+The ACT\_WARN action means that only a message is printed. A message from SCHK() or
+XCHK() will contain the appropriate filename, line number and function name to
+guide you.\footnote{This is of course only supported if \_\_LINE\_\_, \_\_FILE\_\_ 
+and \_\_FUNCTION\_\_ are properly defined by your compiler. Most probably they are.}
+
+\subsection{Optimization}
+ This library has \emph{not} been specially optimized for speed. The functions
+that handle I/O cannot influence performance to a significant extent because
+these functions do not contain nested loops or deep recursion and are mostly
+bound by the time it takes to make the physical act of writing to the hard
+drive/cd-rom/memory etc. Even when reading large files (\~{} 500MB) the CPU time
+spent inside the library functions is negligible. Most functions are either
+sufficiently fast or disk-bound.
+
+ If you think that extra speed is required you may try to compile without
+extended or standard sanity checks. See the file \texttt{``defines.h''} for this.
+You may also omit debugging information (\texttt{-g} includes debugging 
+information in GCC) and try some compiler optimization options such as
+\texttt{-O3 -march=<your cpu>} for GCC.
+
+ I do not intend to optimize this library for speed at the moment, if ever. 
+
+
+\end{document}

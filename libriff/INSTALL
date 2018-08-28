@@ -1,0 +1,30 @@
+
+Currently the default Makefile should work with "make" (also "make clean")
+on unix environments. The Windows32 makefile for the mingw environment, by
+Simon Moser, is also available under the name Makefile.w32. Rename it
+to "Makefile" and you should be able to build libriff under the mingw
+suite of GCC tools.
+
+Note that I have never used the "make install" option. It may be broken. Anyway, 
+if you use libriff for developement you should be able to do that manually,
+_IF_ you need a SYSTEM-WIDE installation :
+
+(as root or user with appropriate permissions)
+
+a) Copy libriff.a and libriff-##.so to /usr/local/lib or any path in the
+   ld.so.conf file
+
+b) Copy all header files to /usr/local/include or (preferrably) in	
+   /usr/local/include/riff where they should be accessible as 
+   #include <riff/riffwrite.h> etc. (#include <riffread.h> if
+   you use the /usr/local/include or /usr/include) 
+
+c) Run ldconfig
+
+NOTE: You do not need a system-wide install of libriff for developement. 
+Just keep a visible copy of librff.a/so and header files in your source
+tree.
+
+I will write a "make install" once libriff has stabilized fully.
+
+Petros

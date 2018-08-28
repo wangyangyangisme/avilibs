@@ -1,0 +1,59 @@
+
+Note that avilibs uses a seperate version
+number than libavi, because avilibs is 
+a *bundle* of libraries that will include
+more software in the future (I hope).
+
+
+Since 0.68 :
+
+- API change : added _AVRinit_stream_position()
+  that tries to find the first frame from every
+  stream. This means that every stream is positioned
+  at its first frame (both in the file and in the
+  index - if available) and not at the beggining
+  of the movi list. This is in effect a "rewind"
+  for all streams. Note that even if this function
+  fails (which it should not!) you can still use
+  the seeking functions. You should call 
+  _AVRinit_stream_position() after AVRbuild_idx()
+  if you build an index from scratch to update
+  the index pointers. (this is not mandatory).
+
+  You may use _AVRinit_stream_position() as a
+  global "rewind".
+
+- API change :  added AVRget_frame_idx, that
+  works with the index (syncs the file to the
+  index before reading) AVRget_frame_idx does 
+  move the file pointer but it does NOT move 
+  the index pointers. This function interoperates
+  nicely with the other *_idx functions.
+
+- The function AVRget_frame() may not interoperate
+  well with the *_idx functions. I have not tested
+  it heavily yet, because reading WITHOUT an index
+  is currently not my first priority.
+
+- API change : AVRprevious_frame_idx and AVRnext_frame_idx()
+  now work "properly", in the sense that they 
+  a) Move the file to the next/previous valid frame
+  b) Move the index to the next/previous valid position
+  The previous behaviour used to be:
+  a) Move the file to the next/previous valid frame	
+  b) Move the index after/before the next/previous valid position
+  To better understand this (if it isn't completely obvious)
+  see the code in the test/ directory.
+  Also they should be more robust and stable.
+
+- Corrected a bug in AVRprevious_frame_idx() that
+  resulted in an index pointer <0. 
+
+- Added some more test code to verify that AVRget_frame_idx()
+  works properly.
+
+- Made some minor changes to ensure compatibility
+  with libriff-1.08 (_RFRraw_seek() has changed).
+
+- Made minor changes to the tutorial and example code.
+

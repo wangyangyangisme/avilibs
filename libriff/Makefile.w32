@@ -1,0 +1,38 @@
+# Makefile contributed by Simon Moser who also did the porting
+# for the mingw developement environment (win32)
+# 
+# You may contact him at Simon.Moser@gmx.de for any inquiries
+# related to this file or the mingw port. Please do not
+# bother him with generic libriff questions.
+
+
+objects = riffread.o riffseek.o riffwrite.o \
+         RFRget_block_info.o RFRget_next_info.o RFRopen_riff_file.o
+
+libriff : $(objects)         
+	dllwrap  --def libriff.def --output-lib=libriff.a --dllname=libriff.dll --driver-name=gcc $(objects) 
+  
+riffread.o : defines.h riffcodes.h sanity.h riffread.h
+	gcc -c -DBUILD_DLL riffread.c
+
+riffseek.o : defines.h riffcodes.h sanity.h riffread.h
+	gcc -c -DBUILD_DLL riffseek.c
+	
+riffwrite.o : riffwrite.h sanity.h
+	gcc -c -DBUILD_DLL riffwrite.c
+	
+RFRget_block_info.o : defines.h riffcodes.h sanity.h riffread.h
+	gcc -c -DBUILD_DLL RFRget_block_info.c
+		
+RFRget_next_info.o : defines.h riffcodes.h sanity.h riffread.h
+	gcc -c -DBUILD_DLL RFRget_next_info.c	
+	
+RFRopen_riff_file.o : defines.h riffcodes.h sanity.h riffread.h
+	gcc -c -DBUILD_DLL RFRopen_riff_file.c
+	
+.PHONY : clean	
+clean :
+	del libriff $(objects) 
+
+
+   

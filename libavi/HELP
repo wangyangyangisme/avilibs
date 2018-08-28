@@ -1,0 +1,20 @@
+
+
+I'm having trouble timing audio streams. I cannot understand how it 
+works, especially in VBR streams. 
+
+Video frames are quite simple: if we have 25 fps, 1 frame is 0.04 sec.
+
+How does that work for audio frames? I understand that for
+PCM (e.g) 44100 16bit samples are 1 second but what happens
+with MP3, or OGG, or ADPCM? 
+
+If someone can explain this and/or point me to some authoritative resource
+I would greatly appreciate it. 
+
+Note that the library works OK without this, but I think it would be nice
+to have correct timing (especially in order to deal with synchronization issues).
+
+Petros
+
+<ptsant at otenet.gr>

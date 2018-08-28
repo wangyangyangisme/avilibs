@@ -1,0 +1,10 @@
+
+rft : rft.o
+	gcc -o rft.exe rft.o -L../ -lriff
+	
+rft.o :	rft.c avicodes.h ../riffread.h
+	gcc -c rft.c -I ../
+
+clean : 
+	del *.o 
+
